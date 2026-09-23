@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python print() Function - Alphagen Learning</title>
+  
+  <!-- Google Fonts: Poppins for Alphagen Brand & Fira Code for Python code blocks -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              purple: '#5E48C4',
+              'purple-dark': '#4A3AAD',
+              'purple-mid': '#7B6ED4',
+              'purple-pale': '#EAE7FE',
+              'purple-ghost': '#F5F4FF',
+              yellow: '#FFD071',
+              'yellow-dark': '#E6B84A',
+              'yellow-pale': '#FFF3CC',
+              'near-black': '#1A1A1A',
+              'dark-grey': '#404048',
+              'mid-grey': '#888896',
+              'light-grey': '#F2F2F4',
+              cyan: '#59E4FB',
+              'cyan-dark': '#055F6E',
+              'cyan-pale': '#E0FAFE',
+              coral: '#ED5661',
+              'coral-dark': '#993040',
+              'coral-pale': '#FFF0F1'
+            }
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            code: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #F5F4FF;
+      color: #1A1A1A;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    .slide-stage {
+      width: 100%;
+      max-width: 1140px;
+      min-height: 620px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Slide Panels */
+    .slide-panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .slide-panel.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Custom Notepad Styling for Slide 2 */
+    .notepad-container {
+      background: #FFFDF0;
+      border: 2px solid #E6B84A;
+      box-shadow: 6px 6px 0px #FFD071;
+      border-radius: 20px;
+      background-image: repeating-linear-gradient(#FFFDF0, #FFFDF0 35px, #EAE7FE 36px);
+      line-height: 36px;
+    }
+
+    /* Button Animations */
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-bounce-gentle {
+      animation: bounce-gentle 2s infinite ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    .interactive-card {
+      transition: all 0.2s ease;
+    }
+    .interactive-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-3 md:p-6 bg-brand-purple-ghost text-brand-near-black">
+
+  <header class="w-full max-w-6xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3 bg-white border-2 border-brand-purple-pale p-4 md:p-5 rounded-2xl shadow-sm">
+    <div class="flex items-center gap-3.5">
+      <div class="bg-brand-purple text-white p-3.5 rounded-2xl font-extrabold text-2xl flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-terminal"></i>
+      </div>
+      <div>
+        <h1 class="font-extrabold text-xl md:text-2xl text-brand-purple tracking-tight">Python print() Explorer</h1>
+        <p class="text-xs md:text-sm text-brand-dark-grey font-medium">Alphagen Learning Interactive Module</p>
+      </div>
+    </div>
+
+    <!-- Progress Controls -->
+    <div class="flex items-center gap-3.5">
+      <div class="hidden md:flex items-center gap-2" id="dots-container">
+        <!-- Generated via JS -->
+      </div>
+      <div class="bg-brand-purple-pale border border-brand-purple-mid/30 px-4 py-2 rounded-xl font-bold text-brand-purple text-base">
+        Slide <span id="current-slide-num">1</span> / <span id="total-slides-num">13</span>
+      </div>
+      <select id="jump-menu" onchange="goToSlide(parseInt(this.value))" class="bg-brand-purple-ghost text-brand-purple border-2 border-brand-purple-pale rounded-xl px-3 py-2 text-sm font-bold focus:outline-none focus:border-brand-purple cursor-pointer">
+        <!-- Generated via JS -->
+      </select>
+      <button id="sound-toggle" onclick="toggleSound()" class="bg-brand-purple-ghost hover:bg-brand-purple-pale text-brand-purple p-3 rounded-xl transition-all border border-brand-purple-pale" title="Toggle Sound">
+        <i class="fa-solid fa-volume-high text-xl" id="sound-icon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="w-full flex-grow flex items-center justify-center">
+    <div class="slide-stage w-full bg-white border-2 border-brand-purple-pale rounded-3xl shadow-xl p-6 md:p-9 flex flex-col justify-between overflow-hidden relative">
+
+      <!-- ================= SLIDE 1: Title Slide ================= -->
+      <div class="slide-panel active flex-col justify-center items-center text-center h-full gap-7 my-auto" id="slide-1">
+        <div class="inline-block bg-brand-purple-pale text-brand-purple px-6 py-2.5 rounded-full text-base md:text-lg font-bold tracking-wide uppercase shadow-sm">
+          Interactive Coding Lesson
+        </div>
+        
+        <h1 class="font-extrabold text-5xl sm:text-6xl md:text-7xl text-brand-near-black leading-tight max-w-4xl">
+          What is <span class="text-brand-purple underline decoration-brand-yellow decoration-wavy underline-offset-8">print</span>?
+        </h1>
+
+        <button onclick="nextSlide()" class="mt-4 bg-brand-yellow hover:bg-brand-yellow-dark text-brand-near-black font-extrabold text-2xl md:text-3xl px-12 py-5 rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-4">
+          <span>Start Exploring!</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- ================= SLIDE 2: Real Life Analogy (Notepad) ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-2">
+        <div>
+          <div class="mb-4">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Real-Life Analogy</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">How do you write a message to a friend?</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+            <!-- Left: Notepad Input -->
+            <div class="md:col-span-6 bg-brand-purple-ghost border-2 border-brand-purple-pale p-5 rounded-3xl">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-brand-purple text-base flex items-center gap-2">
+                  <i class="fa-solid fa-pen-to-square"></i> Your Notepad
+                </span>
+                <span class="text-xs text-brand-mid-grey font-bold">Type below!</span>
+              </div>
+              <div class="notepad-container p-4 min-h-[160px] flex flex-col justify-between">
+                <textarea id="notepad-input" class="w-full bg-transparent font-sans text-lg md:text-xl text-brand-near-black focus:outline-none resize-none" rows="3" placeholder="Type a message for your friend here..."></textarea>
+                <div class="text-right">
+                  <button onclick="previewNotepadMessage()" class="bg-brand-purple hover:bg-brand-purple-dark text-white font-bold text-sm px-4 py-2 rounded-xl transition shadow">
+                    Show Message 📝
+                  </button>
+                </div>
+              </div>
+              <div id="notepad-preview-output" class="mt-3 p-3 bg-white border border-brand-purple-pale rounded-xl text-brand-purple font-bold text-base hidden">
+              </div>
+            </div>
+
+            <!-- Right: Questions & Choice -->
+            <div class="md:col-span-6 flex flex-col gap-3">
+              <p class="font-bold text-lg text-brand-near-black">
+                So, how do you normally send or write messages to your friend?
+              </p>
+
+              <button onclick="selectNotepadOption(this, true)" class="notepad-opt bg-brand-purple-ghost hover:bg-brand-purple-pale border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+                <span>📱 Type it on a phone / tablet</span>
+                <i class="fa-regular fa-circle text-brand-mid-grey text-xl status-icon"></i>
+              </button>
+
+              <button onclick="selectNotepadOption(this, true)" class="notepad-opt bg-brand-purple-ghost hover:bg-brand-purple-pale border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+                <span>📄 Write it on paper / notebook</span>
+                <i class="fa-regular fa-circle text-brand-mid-grey text-xl status-icon"></i>
+              </button>
+
+              <button onclick="selectNotepadOption(this, false)" class="notepad-opt bg-brand-purple-ghost hover:bg-brand-purple-pale border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+                <span>🧠 Telepathy (Mind Reading)</span>
+                <i class="fa-regular fa-circle text-brand-mid-grey text-xl status-icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="notepad-explanation" class="mt-3 p-4 rounded-2xl bg-brand-yellow-pale border-2 border-brand-yellow-dark/40 text-brand-near-black font-bold text-base md:text-lg flex items-center gap-3">
+          <i class="fa-solid fa-lightbulb text-brand-yellow-dark text-2xl"></i>
+          <span>In Python programming, to display or "send" messages onto the computer screen, we use the <strong>print()</strong> function!</span>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 3: Interactive Print Command ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-3">
+        <div>
+          <div class="mb-4">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Hands-on Tryout</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Let's Print Messages! 💬</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+            <!-- Left: Python Editor -->
+            <div class="md:col-span-7 bg-slate-900 border-2 border-slate-700 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-700 text-xs text-slate-400">
+                  <div class="w-3.5 h-3.5 rounded-full bg-red-500"></div>
+                  <div class="w-3.5 h-3.5 rounded-full bg-yellow-500"></div>
+                  <div class="w-3.5 h-3.5 rounded-full bg-green-500"></div>
+                  <span class="ml-2 font-bold text-slate-300">my_print.py</span>
+                </div>
+
+                <div class="text-xl md:text-2xl text-white flex flex-wrap items-center gap-2">
+                  <span class="text-brand-cyan font-bold">print</span><span class="text-white">(</span><span class="text-emerald-400">"</span>
+                  <input type="text" id="slide3-user-text" value="Hello my best friend!" class="bg-slate-800 text-emerald-400 border-b-2 border-brand-cyan px-2 py-1 font-code text-xl md:text-2xl focus:outline-none w-64 md:w-80">
+                  <span class="text-emerald-400">"</span><span class="text-white">)</span>
+                </div>
+              </div>
+
+              <div class="mt-6 pt-3 border-t border-slate-800 flex justify-end">
+                <button onclick="runSlide3Print()" class="bg-brand-yellow hover:bg-brand-yellow-dark text-brand-near-black font-extrabold text-lg px-6 py-3 rounded-xl transition-all hover:scale-105 active:scale-95 shadow flex items-center gap-2">
+                  <i class="fa-solid fa-play"></i> Test Code ▶
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: Terminal Output -->
+            <div class="md:col-span-5 bg-black border-2 border-slate-800 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="text-sm text-emerald-400 font-bold mb-3 flex items-center gap-2 border-b border-slate-800 pb-2">
+                  <i class="fa-solid fa-terminal"></i> Python Screen Output
+                </div>
+                <div id="slide3-terminal-output" class="text-xl md:text-2xl text-brand-yellow font-bold pt-2">
+                  Hello my best friend!
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 italic">Notice: The quotation marks tell Python this is text, but they don't appear on the screen!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-brand-purple-pale border border-brand-purple-mid/30 p-4 rounded-2xl text-center font-bold text-base md:text-lg text-brand-purple">
+          💡 Anything put inside <code class="bg-white px-2 py-1 rounded border border-brand-purple-pale font-code">print("...")</code> gets displayed directly on the screen!
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 4: Sandbox Coding Challenge 1 ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-4">
+        <div>
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Sandbox Coding Challenge</span>
+              <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Print Messages for Everyone! 🚀</h2>
+            </div>
+            <div class="bg-brand-yellow-pale border border-brand-yellow-dark/40 px-4 py-2 rounded-xl text-brand-near-black font-bold text-base">
+              Completed: <span id="challenge1-count" class="text-brand-purple font-extrabold text-xl">0</span> / 3
+            </div>
+          </div>
+
+          <div class="bg-brand-purple text-white px-5 py-3 rounded-2xl font-bold text-base md:text-lg mb-4 flex items-center gap-3">
+            <i class="fa-solid fa-laptop-code text-brand-yellow text-2xl"></i>
+            <span>Open your <strong>Python Sandbox / IDE</strong> and write the following 3 print statements!</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Task 1: Friend -->
+            <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4.5 rounded-2xl flex flex-col justify-between">
+              <div>
+                <div class="font-extrabold text-lg text-brand-purple mb-1">1. Message for Friend 🤝</div>
+                <p class="text-xs text-brand-dark-grey mb-3">Write code in your sandbox to print a nice message for your friend:</p>
+                <div class="font-code text-sm bg-slate-900 text-emerald-400 p-3 rounded-xl mb-3">
+                  print("You are awesome!")
+                </div>
+              </div>
+              <button onclick="testChallenge1Item(this, 'friend')" class="c1-btn bg-brand-purple hover:bg-brand-purple-dark text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Done in Sandbox!</span>
+                <i class="fa-regular fa-circle text-lg status-icon"></i>
+              </button>
+            </div>
+
+            <!-- Task 2: Teacher -->
+            <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4.5 rounded-2xl flex flex-col justify-between">
+              <div>
+                <div class="font-extrabold text-lg text-brand-purple mb-1">2. Message for Teacher 👩‍🏫</div>
+                <p class="text-xs text-brand-dark-grey mb-3">Write code in your sandbox to print a message for your teacher:</p>
+                <div class="font-code text-sm bg-slate-900 text-emerald-400 p-3 rounded-xl mb-3">
+                  print("Thank you teacher!")
+                </div>
+              </div>
+              <button onclick="testChallenge1Item(this, 'teacher')" class="c1-btn bg-brand-purple hover:bg-brand-purple-dark text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Done in Sandbox!</span>
+                <i class="fa-regular fa-circle text-lg status-icon"></i>
+              </button>
+            </div>
+
+            <!-- Task 3: Parents -->
+            <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4.5 rounded-2xl flex flex-col justify-between">
+              <div>
+                <div class="font-extrabold text-lg text-brand-purple mb-1">3. Message for Parents ❤️</div>
+                <p class="text-xs text-brand-dark-grey mb-3">Write code in your sandbox to print a message for your parents:</p>
+                <div class="font-code text-sm bg-slate-900 text-emerald-400 p-3 rounded-xl mb-3">
+                  print("I love my family!")
+                </div>
+              </div>
+              <button onclick="testChallenge1Item(this, 'parent')" class="c1-btn bg-brand-purple hover:bg-brand-purple-dark text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Done in Sandbox!</span>
+                <i class="fa-regular fa-circle text-lg status-icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="challenge1-feedback" class="mt-3 p-4 rounded-2xl bg-brand-purple-pale border border-brand-purple-mid/30 text-center font-bold text-base md:text-lg text-brand-purple">
+          Write each print statement in your Python Sandbox, then click 'Done in Sandbox!'
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 5: Revision (Rules of Print) ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-5">
+        <div>
+          <div class="mb-3">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Concept Revision</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">What do you have to keep in mind?</h2>
+            <p class="text-base text-brand-dark-grey mt-1">Select all the <strong>CORRECT</strong> rules for using the print command in Python:</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <button onclick="toggleRuleQuiz(this, true, 'Correct! Print statements must always be enclosed within brackets ( ).')" class="rule-quiz-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>A) Statements should be enclosed within brackets ( )</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+
+            <button onclick="toggleRuleQuiz(this, false, 'Incorrect! Python commands are lowercase. PRINT in uppercase gives an error!')" class="rule-quiz-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>B) You must write PRINT in capital letters</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+
+            <button onclick="toggleRuleQuiz(this, true, 'Correct! Text strings must be enclosed within quotation marks &quot; &quot;.')" class="rule-quiz-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>C) Text statements should be enclosed within quotations " "</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+
+            <button onclick="toggleRuleQuiz(this, false, 'Incorrect! Quotation marks are mandatory for text strings!')" class="rule-quiz-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>D) Quotation marks are optional for words</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+
+            <button onclick="toggleRuleQuiz(this, true, 'Correct! The print command is required to show output on screen.')" class="rule-quiz-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-bold text-lg text-brand-near-black transition-all flex items-center justify-between col-span-1 md:col-span-2">
+              <span>E) The print command is compulsory to display anything</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="rule-quiz-feedback" class="mt-3 p-4 rounded-2xl bg-brand-purple-ghost border border-brand-purple-pale text-center font-bold text-base md:text-lg text-brand-purple min-h-[56px] flex items-center justify-center">
+          Tap options above to test your knowledge of print rules!
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 6: Printing Numbers ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-6">
+        <div>
+          <div class="mb-3">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">New Discovery</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Let's Print Numbers! 🔢</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+            <!-- Code Editor Left -->
+            <div class="md:col-span-7 bg-slate-900 border-2 border-slate-700 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-700 text-xs text-slate-400">
+                  <div class="w-3.5 h-3.5 rounded-full bg-red-500"></div>
+                  <div class="w-3.5 h-3.5 rounded-full bg-yellow-500"></div>
+                  <div class="w-3.5 h-3.5 rounded-full bg-green-500"></div>
+                  <span class="ml-2 font-bold text-slate-300">number_print.py</span>
+                </div>
+
+                <div class="text-xl md:text-2xl text-white flex items-center gap-2">
+                  <span class="text-brand-cyan font-bold">print</span><span class="text-white">(</span>
+                  <input type="number" id="slide6-num-input" value="100" class="bg-slate-800 text-brand-yellow font-bold border-b-2 border-brand-yellow px-2 py-1 font-code text-xl md:text-2xl focus:outline-none w-36">
+                  <span class="text-white">)</span>
+                </div>
+              </div>
+
+              <div class="mt-6 pt-3 border-t border-slate-800 flex justify-end">
+                <button onclick="runSlide6Number()" class="bg-brand-yellow hover:bg-brand-yellow-dark text-brand-near-black font-extrabold text-lg px-6 py-3 rounded-xl transition-all hover:scale-105 active:scale-95 shadow flex items-center gap-2">
+                  <i class="fa-solid fa-play"></i> Run Number Code ▶
+                </button>
+              </div>
+            </div>
+
+            <!-- Terminal Right -->
+            <div class="md:col-span-5 bg-black border-2 border-slate-800 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="text-sm text-emerald-400 font-bold mb-3 flex items-center gap-2 border-b border-slate-800 pb-2">
+                  <i class="fa-solid fa-terminal"></i> Terminal Screen
+                </div>
+                <div id="slide6-terminal-output" class="text-3xl text-brand-yellow font-bold pt-2">
+                  100
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 italic">Notice: There are NO quotation marks around the number!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-brand-yellow-pale border-2 border-brand-yellow-dark/50 p-4 rounded-2xl flex items-center gap-4">
+          <i class="fa-solid fa-bolt text-brand-yellow-dark text-3xl"></i>
+          <p class="text-base md:text-lg text-brand-near-black font-bold">
+            OBSERVE: Numbers DO NOT need quotation marks inside <code class="bg-white px-2 py-0.5 rounded text-brand-purple font-code">print()</code>!
+          </p>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 7: Numbers Sandbox Challenge ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-7">
+        <div>
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Sandbox Challenge</span>
+              <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Print 3 Favorite Numbers! 🎯</h2>
+            </div>
+            <div class="bg-brand-purple-pale border border-brand-purple-mid/30 px-4 py-2 rounded-xl text-brand-purple font-bold text-base">
+              Progress: <span id="num-challenge-count" class="font-extrabold text-xl">0</span> / 3
+            </div>
+          </div>
+
+          <div class="bg-brand-purple text-white px-5 py-3 rounded-2xl font-bold text-base md:text-lg mb-4 flex items-center gap-3">
+            <i class="fa-solid fa-laptop-code text-brand-yellow text-2xl"></i>
+            <span>Open your <strong>Python Sandbox / IDE</strong> and print your 3 favorite numbers!</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Favorite Number 1 -->
+            <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl flex flex-col justify-between">
+              <div>
+                <div class="font-extrabold text-lg text-brand-purple mb-1">First Favorite #</div>
+                <p class="text-xs text-brand-dark-grey mb-2">Code in your sandbox:</p>
+                <div class="font-code text-base bg-slate-900 text-brand-yellow p-3 rounded-xl mb-3">
+                  print(7)
+                </div>
+              </div>
+              <button onclick="testNumberChallenge(this, 1)" class="num-btn bg-brand-purple hover:bg-brand-purple-dark text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Completed in Sandbox!</span>
+                <i class="fa-regular fa-circle text-lg status-icon"></i>
+              </button>
+            </div>
+
+            <!-- Favorite Number 2 -->
+            <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl flex flex-col justify-between">
+              <div>
+                <div class="font-extrabold text-lg text-brand-purple mb-1">Second Favorite #</div>
+                <p class="text-xs text-brand-dark-grey mb-2">Code in your sandbox:</p>
+                <div class="font-code text-base bg-slate-900 text-brand-yellow p-3 rounded-xl mb-3">
+                  print(24)
+                </div>
+              </div>
+              <button onclick="testNumberChallenge(this, 2)" class="num-btn bg-brand-purple hover:bg-brand-purple-dark text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Completed in Sandbox!</span>
+                <i class="fa-regular fa-circle text-lg status-icon"></i>
+              </button>
+            </div>
+
+            <!-- Favorite Number 3 -->
+            <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl flex flex-col justify-between">
+              <div>
+                <div class="font-extrabold text-lg text-brand-purple mb-1">Third Favorite #</div>
+                <p class="text-xs text-brand-dark-grey mb-2">Code in your sandbox:</p>
+                <div class="font-code text-base bg-slate-900 text-brand-yellow p-3 rounded-xl mb-3">
+                  print(100)
+                </div>
+              </div>
+              <button onclick="testNumberChallenge(this, 3)" class="num-btn bg-brand-purple hover:bg-brand-purple-dark text-white font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Completed in Sandbox!</span>
+                <i class="fa-regular fa-circle text-lg status-icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="num-challenge-feedback" class="mt-3 p-4 rounded-2xl bg-brand-purple-pale border border-brand-purple-mid/30 text-center font-bold text-base md:text-lg text-brand-purple">
+          Write each number print statement in your sandbox, then check off each item!
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 8: Syntax Detective (Numbers & Strings) ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-8">
+        <div>
+          <div class="mb-3">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Syntax Detective</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Spot Correct vs Incorrect Syntax 🔍</h2>
+            <p class="text-base text-brand-dark-grey mt-1">Click any code block below. Correct statements turn green, invalid ones turn red!</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <button onclick="evaluateSyntaxChip(this, true, 'Valid! Text in quotes and correct lowercase print')" class="syntax-chip bg-brand-purple-ghost border-2 border-brand-purple-pale font-code text-base md:text-lg text-brand-purple p-4 rounded-2xl font-bold transition-all shadow-sm">
+              print("Hello World")
+            </button>
+
+            <button onclick="evaluateSyntaxChip(this, false, 'Invalid! PRINT must be lowercase print ❌')" class="syntax-chip bg-brand-purple-ghost border-2 border-brand-purple-pale font-code text-base md:text-lg text-brand-purple p-4 rounded-2xl font-bold transition-all shadow-sm">
+              PRINT("Python")
+            </button>
+
+            <button onclick="evaluateSyntaxChip(this, true, 'Valid! Numbers do not need quotes inside print')" class="syntax-chip bg-brand-purple-ghost border-2 border-brand-purple-pale font-code text-base md:text-lg text-brand-purple p-4 rounded-2xl font-bold transition-all shadow-sm">
+              print(100)
+            </button>
+
+            <button onclick="evaluateSyntaxChip(this, false, 'Invalid! Missing closing parenthesis ) ❌')" class="syntax-chip bg-brand-purple-ghost border-2 border-brand-purple-pale font-code text-base md:text-lg text-brand-purple p-4 rounded-2xl font-bold transition-all shadow-sm">
+              print("Coding"
+            </button>
+
+            <button onclick="evaluateSyntaxChip(this, true, 'Valid! Double quotes are properly closed')" class="syntax-chip bg-brand-purple-ghost border-2 border-brand-purple-pale font-code text-base md:text-lg text-brand-purple p-4 rounded-2xl font-bold transition-all shadow-sm">
+              print("Alphagen")
+            </button>
+
+            <button onclick="evaluateSyntaxChip(this, false, 'Invalid! Text requires quotation marks ❌')" class="syntax-chip bg-brand-purple-ghost border-2 border-brand-purple-pale font-code text-base md:text-lg text-brand-purple p-4 rounded-2xl font-bold transition-all shadow-sm">
+              print(Hello)
+            </button>
+          </div>
+        </div>
+
+        <div id="syntax-feedback" class="mt-3 p-4 bg-brand-purple-pale border border-brand-purple-mid/30 rounded-2xl text-base md:text-lg text-center text-brand-purple font-bold min-h-[56px] flex items-center justify-center">
+          Tap any code block above to evaluate syntax!
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 9: Multiline Print Demo ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-9">
+        <div>
+          <div class="mb-3">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Advanced Concept</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Let's Print in Multiple Lines! 📜</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+            <!-- Left: Editor -->
+            <div class="md:col-span-7 bg-slate-900 border-2 border-slate-700 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="text-sm text-slate-400 mb-2 font-bold">multiline_demo.py</div>
+                <div class="text-lg text-white">
+                  <span class="text-brand-cyan font-bold">print</span>('''<br>
+                  <div class="text-emerald-400 pl-4 py-1">
+                    Line 1: Hello!<br>
+                    Line 2: Python is fun!<br>
+                    Line 3: Learning to code!
+                  </div>
+                  ''')
+                </div>
+              </div>
+              <button onclick="runMultilineDemo()" class="mt-4 bg-brand-yellow hover:bg-brand-yellow-dark text-brand-near-black font-extrabold text-base px-5 py-2.5 rounded-xl transition shadow">
+                Run Multiline Demo ▶
+              </button>
+            </div>
+
+            <!-- Right: Terminal Output -->
+            <div class="md:col-span-5 bg-black border-2 border-slate-800 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="text-sm text-emerald-400 font-bold mb-2">Terminal Screen</div>
+                <div id="multiline-terminal-output" class="text-base text-brand-yellow font-bold whitespace-pre-line pt-1">
+                  Line 1: Hello!
+Line 2: Python is fun!
+Line 3: Learning to code!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-brand-yellow-pale border-2 border-brand-yellow-dark/50 p-4 rounded-2xl flex items-center gap-4">
+          <i class="fa-solid fa-quote-left text-brand-yellow-dark text-3xl"></i>
+          <p class="text-base md:text-lg text-brand-near-black font-bold">
+            OBSERVE: Multiline text in Python is enclosed within triple quotations <code class="bg-white px-2 py-0.5 rounded text-brand-purple font-code">'''...'''</code>!
+          </p>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 10: Multiline Sandbox Activity ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-10">
+        <div>
+          <div class="mb-3">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Sandbox Coding Activity</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Open Your Sandbox! 🌟</h2>
+          </div>
+
+          <div class="bg-brand-purple text-white px-5 py-3 rounded-2xl font-bold text-base md:text-lg mb-4 flex items-center gap-3">
+            <i class="fa-solid fa-laptop-code text-brand-yellow text-2xl"></i>
+            <span>Open your <strong>Python Sandbox / IDE</strong> and choose <strong>ONE</strong> of the 3 topics below to code in 3 lines using triple quotes <code class="font-code text-brand-yellow">'''...'''</code>!</span>
+          </div>
+
+          <!-- 3 Topic Choice Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Topic 1: Favorite Sport -->
+            <button onclick="selectSandboxTopic(this, 'sport')" class="topic-card bg-brand-purple-ghost hover:bg-brand-purple-pale border-2 border-brand-purple-pale p-4.5 rounded-2xl text-left transition-all flex flex-col justify-between">
+              <div>
+                <div class="text-3xl mb-2">⚽</div>
+                <h3 class="font-extrabold text-lg text-brand-purple mb-1">1. Favorite Sport</h3>
+                <p class="text-xs text-brand-dark-grey mb-3">Write 3 lines in your sandbox about your favorite sport!</p>
+                <div class="font-code text-xs bg-slate-900 text-emerald-400 p-2.5 rounded-xl text-left">
+                  print('''Line 1: Soccer<br>Line 2: Fast & fun<br>Line 3: I play weekends''')
+                </div>
+              </div>
+              <div class="mt-3 text-right">
+                <span class="text-xs font-bold text-brand-purple bg-white px-3 py-1 rounded-lg border border-brand-purple-pale shadow-sm">Select Topic ➔</span>
+              </div>
+            </button>
+
+            <!-- Topic 2: Favorite Ice Cream -->
+            <button onclick="selectSandboxTopic(this, 'icecream')" class="topic-card bg-brand-purple-ghost hover:bg-brand-purple-pale border-2 border-brand-purple-pale p-4.5 rounded-2xl text-left transition-all flex flex-col justify-between">
+              <div>
+                <div class="text-3xl mb-2">🍦</div>
+                <h3 class="font-extrabold text-lg text-brand-purple mb-1">2. Ice Cream Flavor</h3>
+                <p class="text-xs text-brand-dark-grey mb-3">Write 3 lines in your sandbox about your favorite ice cream!</p>
+                <div class="font-code text-xs bg-slate-900 text-emerald-400 p-2.5 rounded-xl text-left">
+                  print('''Line 1: Chocolate Fudge<br>Line 2: Cold & sweet<br>Line 3: Best dessert ever''')
+                </div>
+              </div>
+              <div class="mt-3 text-right">
+                <span class="text-xs font-bold text-brand-purple bg-white px-3 py-1 rounded-lg border border-brand-purple-pale shadow-sm">Select Topic ➔</span>
+              </div>
+            </button>
+
+            <!-- Topic 3: Favorite Holiday Spot -->
+            <button onclick="selectSandboxTopic(this, 'holiday')" class="topic-card bg-brand-purple-ghost hover:bg-brand-purple-pale border-2 border-brand-purple-pale p-4.5 rounded-2xl text-left transition-all flex flex-col justify-between">
+              <div>
+                <div class="text-3xl mb-2">🏖️</div>
+                <h3 class="font-extrabold text-lg text-brand-purple mb-1">3. Holiday Spot</h3>
+                <p class="text-xs text-brand-dark-grey mb-3">Write 3 lines in your sandbox about your favorite vacation spot!</p>
+                <div class="font-code text-xs bg-slate-900 text-emerald-400 p-2.5 rounded-xl text-left">
+                  print('''Line 1: Beach Resort<br>Line 2: Sunny waves<br>Line 3: Sandcastle time''')
+                </div>
+              </div>
+              <div class="mt-3 text-right">
+                <span class="text-xs font-bold text-brand-purple bg-white px-3 py-1 rounded-lg border border-brand-purple-pale shadow-sm">Select Topic ➔</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div id="multiline-topic-feedback" class="mt-3 p-4 bg-brand-purple-pale border border-brand-purple-mid/30 rounded-2xl text-center font-bold text-base md:text-lg text-brand-purple flex flex-wrap items-center justify-between gap-3">
+          <span>Choose a topic above, type the code into your Sandbox, and click complete!</span>
+          <button onclick="confirmSandboxMultilineDone()" class="bg-brand-purple hover:bg-brand-purple-dark text-white px-6 py-2 rounded-xl text-sm font-bold shadow transition">
+            Completed in Sandbox! ✅
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 11: Escape Characters ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-11">
+        <div>
+          <div class="mb-3">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Special Codes</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Escape Characters: \n and \t ⚡</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <!-- Left Controls -->
+            <div class="md:col-span-5 flex flex-col gap-4">
+              <p class="text-base text-brand-dark-grey">
+                Escape characters add special formatting inside text:
+              </p>
+
+              <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl flex items-center justify-between">
+                <div>
+                  <div class="font-code font-bold text-brand-purple text-xl">\n</div>
+                  <div class="text-sm text-brand-dark-grey font-bold">New Line Character</div>
+                </div>
+                <button onclick="setEscapeMode('\\n')" id="btn-escape-n" class="bg-brand-purple text-white font-bold px-4 py-2 rounded-xl shadow">
+                  Active
+                </button>
+              </div>
+
+              <div class="bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl flex items-center justify-between">
+                <div>
+                  <div class="font-code font-bold text-brand-purple text-xl">\t</div>
+                  <div class="text-sm text-brand-dark-grey font-bold">Tab Space Character</div>
+                </div>
+                <button onclick="setEscapeMode('\\t')" id="btn-escape-t" class="bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl shadow">
+                  Select
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Live Simulator -->
+            <div class="md:col-span-7 bg-slate-900 border-2 border-slate-700 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="text-sm text-slate-400 mb-2">Code Example:</div>
+                <div id="escape-code-display" class="text-xl text-white bg-slate-800 p-3 rounded-xl">
+                  print("Hello<span class="text-brand-yellow font-bold">\n</span>World")
+                </div>
+
+                <div class="text-sm text-emerald-400 mt-4 mb-2">Terminal Output:</div>
+                <div id="escape-terminal-display" class="text-2xl text-brand-yellow bg-black p-4 rounded-xl whitespace-pre-wrap min-h-[90px]">
+                  Hello
+World
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="escape-info-banner" class="bg-brand-purple-pale border border-brand-purple-mid/30 p-4 rounded-2xl text-center font-bold text-base md:text-lg text-brand-purple">
+          💡 <strong>\n</strong> starts a new line, while <strong>\t</strong> adds horizontal tab space!
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 12: Escape Character Sandbox Activity ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-12">
+        <div>
+          <div class="mb-3">
+            <span class="text-brand-purple font-bold text-sm uppercase tracking-wider">Sandbox Activity</span>
+            <h2 class="text-3xl md:text-4xl text-brand-near-black font-bold">Print Your Favorite Sport in 3 Lines! ⚽</h2>
+          </div>
+
+          <div class="bg-brand-purple text-white px-5 py-3 rounded-2xl font-bold text-base md:text-lg mb-4 flex items-center gap-3">
+            <i class="fa-solid fa-laptop-code text-brand-yellow text-2xl"></i>
+            <span>Open your <strong>Python Sandbox</strong> and write code using the <code class="font-code text-brand-yellow">\n</code> escape character inside a single print statement:</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+            <div class="md:col-span-7 bg-slate-900 border-2 border-slate-700 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="text-sm text-slate-400 mb-2 font-bold">sport_print.py</div>
+                <div class="text-xl text-emerald-400 bg-slate-800 p-4 rounded-xl border border-slate-700">
+                  print("Soccer<span class="text-brand-yellow font-bold">\n</span>Fast<span class="text-brand-yellow font-bold">\n</span>Fun!")
+                </div>
+              </div>
+              <button onclick="confirmSportEscapeDone()" class="mt-4 bg-brand-yellow hover:bg-brand-yellow-dark text-brand-near-black font-extrabold text-base py-3.5 rounded-xl shadow transition hover:scale-105">
+                Completed in Sandbox! ✅
+              </button>
+            </div>
+
+            <div class="md:col-span-5 bg-black border-2 border-slate-800 rounded-2xl p-5 flex flex-col justify-between font-code shadow-md">
+              <div>
+                <div class="text-sm text-emerald-400 font-bold mb-2">Terminal Screen Output</div>
+                <div id="escape-sport-output" class="text-xl text-brand-yellow font-bold whitespace-pre-wrap">
+                  Soccer
+Fast
+Fun!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="escape-sport-feedback" class="mt-3 p-3.5 bg-brand-purple-pale border border-brand-purple-mid/30 rounded-2xl text-center font-bold text-base text-brand-purple">
+          Write this statement in your sandbox using <code class="font-code">\n</code> and run it!
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 13: Final Mastery Quiz ================= -->
+      <div class="slide-panel flex-col h-full justify-between" id="slide-13">
+        <div>
+          <div class="mb-3 text-center">
+            <span class="bg-brand-yellow text-brand-near-black px-5 py-1.5 rounded-full font-extrabold text-xs md:text-sm uppercase tracking-widest inline-block mb-1">
+              Final Mastery Quiz
+            </span>
+            <h2 class="text-3xl md:text-5xl text-brand-purple font-extrabold">Select ALL Correct Print Statements! 🏆</h2>
+            <p class="text-base text-brand-dark-grey mt-1">Tap all valid Python print statements below to complete the lesson:</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button onclick="toggleFinalMastery(this, true)" class="final-mastery-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-code font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>print("I love coding!")</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+
+            <button onclick="toggleFinalMastery(this, false)" class="final-mastery-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-code font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>PRINT("Hello")</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+
+            <button onclick="toggleFinalMastery(this, true)" class="final-mastery-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-code font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>print(2026)</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+
+            <button onclick="toggleFinalMastery(this, true)" class="final-mastery-btn bg-brand-purple-ghost border-2 border-brand-purple-pale p-4 rounded-2xl text-left font-code font-bold text-lg text-brand-near-black transition-all flex items-center justify-between">
+              <span>print('''Line 1\nLine 2''')</span>
+              <i class="fa-regular fa-circle text-brand-mid-grey text-2xl status-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="final-mastery-banner" class="bg-brand-yellow text-brand-near-black p-4.5 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-3 px-6">
+          <span class="font-extrabold text-base md:text-xl" id="final-banner-text">Tap the correct statements above!</span>
+          <button onclick="triggerConfetti()" class="bg-brand-purple hover:bg-brand-purple-dark text-white px-6 py-2.5 rounded-xl text-base font-extrabold shadow transition-all">
+            Celebrate & Finish! 🚀
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer Controls -->
+  <footer class="w-full max-w-6xl mx-auto mt-4 flex items-center justify-between gap-4">
+    <button id="prev-btn" onclick="prevSlide()" class="bg-white hover:bg-brand-purple-pale border-2 border-brand-purple-pale text-brand-purple px-7 py-3.5 rounded-2xl font-extrabold text-lg flex items-center gap-2.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Previous</span>
+    </button>
+
+    <div class="hidden md:flex items-center gap-2 text-base text-brand-dark-grey font-semibold">
+      <span>Use Arrow Keys ⬅️ ➡️ to change slides</span>
+    </div>
+
+    <button id="next-btn" onclick="nextSlide()" class="bg-brand-yellow hover:bg-brand-yellow-dark text-brand-near-black px-7 py-3.5 rounded-2xl font-extrabold text-lg flex items-center gap-2.5 shadow-md transition-all">
+      <span>Next</span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </footer>
+
+  <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 13;
+    let soundEnabled = true;
+
+    /* Sound Effects Generator using Web Audio API */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+          osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
+        } else if (type === 'pop') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.08);
+        }
+      } catch (e) {
+        console.log("Audio exception", e);
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('sound-icon');
+      icon.className = soundEnabled ? 'fa-solid fa-volume-high text-xl' : 'fa-solid fa-volume-xmark text-xl';
+    }
+
+    function initNavigation() {
+      const dotsContainer = document.getElementById('dots-container');
+      const jumpMenu = document.getElementById('jump-menu');
+      dotsContainer.innerHTML = '';
+      jumpMenu.innerHTML = '';
+
+      const slideTitles = [
+        "1. Title", "2. Notepad Analogy", "3. Try Print()", "4. Sandbox Challenge 1",
+        "5. Rules Revision", "6. Print Numbers", "7. Numbers Challenge", "8. Syntax Detective",
+        "9. Multiline Demo", "10. Multiline Topics", "11. Escape Characters", "12. Escape Activity", "13. Final Quiz"
+      ];
+
+      for (let i = 1; i <= totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = `w-3 h-3 rounded-full transition-all ${i === 1 ? 'bg-brand-purple w-7' : 'bg-brand-purple-pale hover:bg-brand-purple-mid'}`;
+        dot.onclick = () => goToSlide(i);
+        dot.title = `Slide ${i}`;
+        dot.id = `dot-${i}`;
+        dotsContainer.appendChild(dot);
+
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.innerText = slideTitles[i - 1] || `Slide ${i}`;
+        jumpMenu.appendChild(opt);
+      }
+    }
+
+    function updateSlideDisplay() {
+      document.querySelectorAll('.slide-panel').forEach((panel, idx) => {
+        panel.classList.remove('active');
+        if (idx + 1 === currentSlide) {
+          panel.classList.add('active');
+        }
+      });
+
+      document.getElementById('current-slide-num').innerText = currentSlide;
+      document.getElementById('total-slides-num').innerText = totalSlides;
+      document.getElementById('jump-menu').value = currentSlide;
+
+      for (let i = 1; i <= totalSlides; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (dot) {
+          dot.className = (i === currentSlide) ? 'w-7 h-3 rounded-full bg-brand-purple transition-all' : 'w-3 h-3 rounded-full bg-brand-purple-pale hover:bg-brand-purple-mid transition-all';
+        }
+      }
+
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+
+      prevBtn.disabled = currentSlide === 1;
+
+      if (currentSlide === totalSlides) {
+        nextBtn.innerHTML = `<span>Finish</span> <i class="fa-solid fa-flag-checkered"></i>`;
+      } else {
+        nextBtn.innerHTML = `<span>Next</span> <i class="fa-solid fa-arrow-right"></i>`;
+      }
+
+      if (currentSlide === totalSlides) {
+        triggerConfetti();
+      }
+    }
+
+    function goToSlide(slideNum) {
+      if (slideNum >= 1 && slideNum <= totalSlides) {
+        currentSlide = slideNum;
+        playSound('pop');
+        updateSlideDisplay();
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) goToSlide(currentSlide - 1);
+    }
+
+    /* Slide 2: Notepad Interactions */
+    function previewNotepadMessage() {
+      const val = document.getElementById('notepad-input').value.trim();
+      const output = document.getElementById('notepad-preview-output');
+      output.classList.remove('hidden');
+
+      if (val.length > 0) {
+        playSound('pop');
+        output.innerText = `Previewing message: "${val}"`;
+      } else {
+        playSound('wrong');
+        output.innerText = `Please type a message in the notepad above first!`;
+      }
+    }
+
+    function selectNotepadOption(btn, isRealWay) {
+      const icon = btn.querySelector('.status-icon');
+      if (isRealWay) {
+        playSound('correct');
+        btn.classList.add('!bg-emerald-600', '!text-white', '!border-emerald-700');
+        icon.className = 'fa-solid fa-circle-check text-2xl text-white';
+      } else {
+        playSound('wrong');
+        btn.classList.add('!bg-brand-coral', '!text-white', '!border-brand-coral-dark', 'animate-shake');
+        setTimeout(() => btn.classList.remove('animate-shake'), 400);
+        icon.className = 'fa-solid fa-circle-xmark text-2xl text-white';
+      }
+    }
+
+    /* Slide 3: Tryout */
+    function runSlide3Print() {
+      playSound('correct');
+      const text = document.getElementById('slide3-user-text').value;
+      document.getElementById('slide3-terminal-output').innerText = text;
+    }
+
+    /* Slide 4: Sandbox Challenge 1 */
+    const challenge1Done = new Set();
+    function testChallenge1Item(btn, key) {
+      playSound('correct');
+      challenge1Done.add(key);
+      btn.classList.add('!bg-emerald-600', '!text-white', '!border-emerald-700');
+      const icon = btn.querySelector('.status-icon');
+      icon.className = 'fa-solid fa-circle-check text-lg text-white';
+
+      document.getElementById('challenge1-count').innerText = challenge1Done.size;
+      const feedback = document.getElementById('challenge1-feedback');
+      feedback.className = "mt-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-center font-bold text-base md:text-lg text-emerald-900";
+      feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> Great! Completed message challenge in Sandbox!`;
+
+      if (challenge1Done.size === 3) {
+        triggerConfetti();
+      }
+    }
+
+    /* Slide 5: Rules Quiz */
+    function toggleRuleQuiz(btn, isCorrect, explanation) {
+      const feedback = document.getElementById('rule-quiz-feedback');
+      const icon = btn.querySelector('.status-icon');
+
+      if (isCorrect) {
+        playSound('correct');
+        btn.classList.add('!bg-emerald-600', '!text-white', '!border-emerald-700');
+        icon.className = 'fa-solid fa-circle-check text-2xl text-white';
+        feedback.className = "mt-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-center font-bold text-base md:text-lg text-emerald-900 min-h-[56px] flex items-center justify-center";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> ${explanation}`;
+      } else {
+        playSound('wrong');
+        btn.classList.add('!bg-brand-coral', '!text-white', '!border-brand-coral-dark', 'animate-shake');
+        setTimeout(() => btn.classList.remove('animate-shake'), 400);
+        icon.className = 'fa-solid fa-circle-xmark text-2xl text-white';
+        feedback.className = "mt-3 p-4 rounded-2xl bg-brand-coral-pale border border-brand-coral/40 text-center font-bold text-base md:text-lg text-brand-coral-dark min-h-[56px] flex items-center justify-center";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-brand-coral mr-2"></i> ${explanation}`;
+      }
+    }
+
+    /* Slide 6: Number Print */
+    function runSlide6Number() {
+      playSound('correct');
+      const num = document.getElementById('slide6-num-input').value;
+      document.getElementById('slide6-terminal-output').innerText = num;
+    }
+
+    /* Slide 7: Number Sandbox Challenge */
+    const numChallengeDone = new Set();
+    function testNumberChallenge(btn, idx) {
+      playSound('correct');
+      numChallengeDone.add(idx);
+      btn.classList.add('!bg-emerald-600', '!text-white', '!border-emerald-700');
+      const icon = btn.querySelector('.status-icon');
+      icon.className = 'fa-solid fa-circle-check text-lg text-white';
+
+      document.getElementById('num-challenge-count').innerText = numChallengeDone.size;
+      const feedback = document.getElementById('num-challenge-feedback');
+      feedback.className = "mt-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-center font-bold text-base md:text-lg text-emerald-900";
+      feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> Checked off number printing task!`;
+
+      if (numChallengeDone.size === 3) {
+        triggerConfetti();
+      }
+    }
+
+    /* Slide 8: Syntax Detective */
+    function evaluateSyntaxChip(btn, isValid, explanation) {
+      const feedback = document.getElementById('syntax-feedback');
+
+      if (isValid) {
+        playSound('correct');
+        btn.classList.add('!bg-emerald-600', '!text-white', '!border-emerald-700');
+        feedback.className = "mt-3 p-4 bg-emerald-50 border border-emerald-300 rounded-2xl text-base md:text-lg text-center text-emerald-900 font-bold min-h-[56px] flex items-center justify-center";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> <strong>VALID SYNTAX!</strong> ${explanation}`;
+      } else {
+        playSound('wrong');
+        btn.classList.add('!bg-brand-coral', '!text-white', '!border-brand-coral-dark', 'animate-shake');
+        setTimeout(() => btn.classList.remove('animate-shake'), 400);
+        feedback.className = "mt-3 p-4 bg-brand-coral-pale border border-brand-coral/40 rounded-2xl text-base md:text-lg text-center text-brand-coral-dark font-bold min-h-[56px] flex items-center justify-center";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-brand-coral mr-2"></i> <strong>INVALID SYNTAX!</strong> ${explanation}`;
+      }
+    }
+
+    /* Slide 9: Multiline Demo */
+    function runMultilineDemo() {
+      playSound('correct');
+      document.getElementById('multiline-terminal-output').innerText = "Line 1: Hello!\nLine 2: Python is fun!\nLine 3: Learning to code!";
+    }
+
+    /* Slide 10: Multiline Sandbox Topics */
+    let selectedTopic = null;
+    function selectSandboxTopic(cardBtn, topicKey) {
+      playSound('pop');
+      selectedTopic = topicKey;
+      document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('!border-brand-purple', '!bg-brand-purple-pale'));
+      cardBtn.classList.add('!border-brand-purple', '!bg-brand-purple-pale');
+
+      const banner = document.getElementById('multiline-topic-feedback');
+      banner.innerHTML = `
+        <span>Great choice! Open your Sandbox and write code for this topic using triple quotes <strong>'''...'''</strong>!</span>
+        <button onclick="confirmSandboxMultilineDone()" class="bg-brand-purple hover:bg-brand-purple-dark text-white px-6 py-2 rounded-xl text-sm font-bold shadow transition">
+          Completed in Sandbox! ✅
+        </button>
+      `;
+    }
+
+    function confirmSandboxMultilineDone() {
+      playSound('correct');
+      triggerConfetti();
+      const banner = document.getElementById('multiline-topic-feedback');
+      banner.className = "mt-3 p-4 bg-emerald-50 border border-emerald-300 rounded-2xl text-center font-bold text-base md:text-lg text-emerald-900";
+      banner.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> Fantastic! Multiline triple-quote code completed in your Sandbox!`;
+    }
+
+    /* Slide 11: Escape Characters */
+    function setEscapeMode(mode) {
+      playSound('pop');
+      const btnN = document.getElementById('btn-escape-n');
+      const btnT = document.getElementById('btn-escape-t');
+      const codeDisplay = document.getElementById('escape-code-display');
+      const termDisplay = document.getElementById('escape-terminal-display');
+
+      if (mode === '\\n') {
+        btnN.className = "bg-brand-purple text-white font-bold px-4 py-2 rounded-xl shadow";
+        btnT.className = "bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl shadow";
+        codeDisplay.innerHTML = `print("Hello<span class="text-brand-yellow font-bold">\\n</span>World")`;
+        termDisplay.innerText = "Hello\nWorld";
+      } else {
+        btnT.className = "bg-brand-purple text-white font-bold px-4 py-2 rounded-xl shadow";
+        btnN.className = "bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl shadow";
+        codeDisplay.innerHTML = `print("Hello<span class="text-brand-yellow font-bold">\\t</span>World")`;
+        termDisplay.innerText = "Hello\tWorld";
+      }
+    }
+
+    /* Slide 12: Escape Sandbox Activity */
+    function confirmSportEscapeDone() {
+      playSound('correct');
+      triggerConfetti();
+      const feedback = document.getElementById('escape-sport-feedback');
+      feedback.className = "mt-3 p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-center font-bold text-base text-emerald-900";
+      feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i> Perfect! Escape character \\n code executed in your Sandbox!`;
+    }
+
+    /* Slide 13: Final Quiz */
+    function toggleFinalMastery(btn, isCorrect) {
+      const icon = btn.querySelector('.status-icon');
+      if (isCorrect) {
+        playSound('correct');
+        btn.classList.add('!bg-emerald-600', '!text-white', '!border-emerald-700');
+        icon.className = 'fa-solid fa-circle-check text-2xl text-white';
+      } else {
+        playSound('wrong');
+        btn.classList.add('!bg-brand-coral', '!text-white', '!border-brand-coral-dark', 'animate-shake');
+        setTimeout(() => btn.classList.remove('animate-shake'), 400);
+        icon.className = 'fa-solid fa-circle-xmark text-2xl text-white';
+      }
+    }
+
+    /* Confetti Canvas Animation */
+    function triggerConfetti() {
+      playSound('correct');
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#5E48C4', '#FFD071', '#59E4FB', '#ED5661', '#7B6ED4'];
+
+      for (let i = 0; i < 80; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 10 + 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vy: Math.random() * 3 + 2,
+          vx: Math.random() * 2 - 1,
+          rot: Math.random() * 360
+        });
+      }
+
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.y += p.vy;
+          p.x += p.vx;
+          p.rot += 2;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        });
+
+        frame++;
+        if (frame < 100) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      animate();
+    }
+
+    /* Keyboard Listener */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    window.onload = () => {
+      initNavigation();
+      updateSlideDisplay();
+    };
+  </script>
+</body>
+</html>
